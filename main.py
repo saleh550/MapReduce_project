@@ -6,8 +6,31 @@ from openpyxl.utils import get_column_letter
 
 # from openpyxl import calculation
 
-def getMonth():
-    return 5
+def getMonth(argument):
+    if argument == 'B':
+        return 1
+    if argument == 'C':
+        return 2
+    if argument == 'D':
+        return 3
+    if argument == 'E':
+        return 4
+    if argument == 'F':
+        return 5
+    if argument == 'G':
+        return 6
+    if argument == 'H':
+        return 7
+    if argument == 'I':
+        return 8
+    if argument == 'J':
+        return 9
+    if argument == 'K':
+        return 10
+    if argument == 'L':
+        return 11
+    if argument == 'M':
+        return 12
 
 
 wb = load_workbook('./DataFile.xlsx', data_only=True)
@@ -50,8 +73,13 @@ for row in range(1, 122):
             if ws[char + str(row)].value > max_number_inMonth:
                 max_number_inMonth = ws[char + str(row)].value
                 max_investors_number_inMonth['year'] = ws['A'+str(row)].value
-                max_investors_number_inMonth['month'] = char
+                max_investors_number_inMonth['month'] = getMonth(char)
                 max_investors_number_inMonth['investors'] = max_number_inMonth
+            if ws[char + str(row)].value < min_number_inMonth:
+                min_number_inMonth = ws[char + str(row)].value
+                min_investors_number_inMonth['year'] = ws['A'+str(row)].value
+                min_investors_number_inMonth['month'] = getMonth(char)
+                min_investors_number_inMonth['investors'] = min_number_inMonth
 
         if char == 'M':
             # print(ws['A'+str(row)].value)
@@ -75,7 +103,8 @@ Multi_year_average = Multi_year_sum / 121
 print("The multi year average is: " + str(Multi_year_average))
 print("In " + str(max_investors_number_inYear['year']) + " was the max of investors of such " + str(max_investors_number_inYear['investors']))
 print("In " + str(min_investors_number_inYear['year']) + " was the min of investors of such " + str(min_investors_number_inYear['investors']))
-print(max_investors_number_inMonth['year'],max_investors_number_inMonth['month'],max_investors_number_inMonth['investors'])
+print(max_investors_number_inMonth['year'], max_investors_number_inMonth['month'], max_investors_number_inMonth['investors'])
+print(min_investors_number_inMonth['year'], min_investors_number_inMonth['month'], min_investors_number_inMonth['investors'])
 # column_letter = 'A'
 # row_number = 2
 # cell = f"{column_letter}{row_number}"
