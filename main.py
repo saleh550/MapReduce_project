@@ -5,32 +5,42 @@ from openpyxl.utils import get_column_letter
 
 
 # from openpyxl import calculation
+def getSeason(argument):
+    if argument == 'C':
+        return "winter"
+    if argument == 'F':
+        return "spring"
+    if argument == 'I':
+        return "summer"
+    if argument == 'L':
+        return "fall"
+
 
 def getMonth(argument):
     if argument == 'B':
-        return 1
+        return 'jan'
     if argument == 'C':
-        return 2
+        return 'feb'
     if argument == 'D':
-        return 3
+        return 'march'
     if argument == 'E':
-        return 4
+        return 'april'
     if argument == 'F':
-        return 5
+        return 'may'
     if argument == 'G':
-        return 6
+        return 'jun'
     if argument == 'H':
-        return 7
+        return 'jul'
     if argument == 'I':
-        return 8
+        return 'aug'
     if argument == 'J':
-        return 9
+        return 'sep'
     if argument == 'K':
-        return 10
+        return 'oct'
     if argument == 'L':
-        return 11
+        return 'nov'
     if argument == 'M':
-        return 12
+        return 'dec'
 
 
 wb = load_workbook('./DataFile.xlsx', data_only=True)
@@ -56,6 +66,16 @@ min_investors_number_inMonth = {
     "investors": 0
 
 }
+max_investors_number_inSeason = {
+    "season": '',
+    "year": '',
+    "investors": 0
+}
+min_investors_number_inSeason = {
+    "season": '',
+    "year": '',
+    "investors": 0
+}
 Multi_year_average = 0
 Multi_year_sum = 0
 min_number_inYear = 350 * 12
@@ -69,12 +89,15 @@ for row in range(1, 122):
         char = get_column_letter(col)
         if char != 'A':
             row_sum += ws[char + str(row)].value
+            # sum of all investors
             Multi_year_sum += ws[char + str(row)].value
+            # calculate the  maximum investors in month
             if ws[char + str(row)].value > max_number_inMonth:
                 max_number_inMonth = ws[char + str(row)].value
                 max_investors_number_inMonth['year'] = ws['A'+str(row)].value
                 max_investors_number_inMonth['month'] = getMonth(char)
                 max_investors_number_inMonth['investors'] = max_number_inMonth
+            # calculate the  minimum investors in month
             if ws[char + str(row)].value < min_number_inMonth:
                 min_number_inMonth = ws[char + str(row)].value
                 min_investors_number_inMonth['year'] = ws['A'+str(row)].value
@@ -82,19 +105,44 @@ for row in range(1, 122):
                 min_investors_number_inMonth['investors'] = min_number_inMonth
 
         if char == 'M':
-            # print(ws['A'+str(row)].value)
-            # print(row_sum)
-            # print("<------------------>")
+            # calculate the max sums of rows for the maximum investors in year
             if row_sum > max_number_inYear:
                 max_number_inYear = row_sum
                 max_investors_number_inYear['year'] = ws['A'+str(row)].value
                 max_investors_number_inYear['investors'] = max_number_inYear
+                # calculate the min sums of rows for the minimum investors in year
             if row_sum < min_number_inYear:
                 min_number_inYear = row_sum
                 min_investors_number_inYear['year'] = ws['A'+str(row)].value
                 min_investors_number_inYear['investors'] = min_number_inYear
-
             row_sum = 0
+
+max_season_investors = 0
+min_season_investors = 3*350
+season_sum = 0
+# This  loop goes through the months in the following way : 12 1 2 3 ... 11
+for row in range(1, 122):
+    for i in range(13, 26):
+        col = i % 13
+        if col == 0:
+            col = 13
+        if col == 1:
+            continue
+        char = get_column_letter(col)
+        season_sum += ws[char + str(row)].value
+        if char == 'C' or char == 'F' or char == 'I' or char == 'L':
+            if season_sum > max_season_investors:
+                max_season_investors = season_sum
+                max_investors_number_inSeason['year'] = ws['A' + str(row)].value
+                max_investors_number_inSeason['season'] = getSeason(char)
+                max_investors_number_inSeason['investors'] = season_sum
+
+            if season_sum < min_season_investors:
+                min_season_investors = season_sum
+                min_investors_number_inSeason['year'] = ws['A' + str(row)].value
+                min_investors_number_inSeason['season'] = getSeason(char)
+                min_investors_number_inSeason['investors'] = season_sum
+            season_sum = 0
 
 
 Multi_year_average = Multi_year_sum / 121
@@ -103,11 +151,7 @@ Multi_year_average = Multi_year_sum / 121
 print("The multi year average is: " + str(Multi_year_average))
 print("In " + str(max_investors_number_inYear['year']) + " was the max of investors of such " + str(max_investors_number_inYear['investors']))
 print("In " + str(min_investors_number_inYear['year']) + " was the min of investors of such " + str(min_investors_number_inYear['investors']))
-print(max_investors_number_inMonth['year'], max_investors_number_inMonth['month'], max_investors_number_inMonth['investors'])
-print(min_investors_number_inMonth['year'], min_investors_number_inMonth['month'], min_investors_number_inMonth['investors'])
-# column_letter = 'A'
-# row_number = 2
-# cell = f"{column_letter}{row_number}"
-# calculated_value = ws[cell].value
-#
-# print(calculated_value)
+print("In " + str(max_investors_number_inMonth['month']) + " " + str(max_investors_number_inMonth['year']) + " was the maximum of investors of such " + str(max_investors_number_inMonth['investors']))
+print("In " + str(min_investors_number_inMonth['month']) + " " + str(min_investors_number_inMonth['year']) + " was the minimum of investors of such " + str(min_investors_number_inMonth['investors']))
+print("In " + str(max_investors_number_inSeason['season']) + " " + str(max_investors_number_inSeason['year']) + " was the maximum of investors of such " + str(max_investors_number_inSeason['investors']))
+print("In " + str(min_investors_number_inSeason['season']) + " " + str(min_investors_number_inSeason['year']) + " was the minimum of investors of such " + str(min_investors_number_inSeason['investors']))
