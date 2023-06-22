@@ -117,9 +117,13 @@ for row in range(1, 122):
                 min_investors_number_inYear['investors'] = min_number_inYear
             row_sum = 0
 
+Multi_year_average = Multi_year_sum / 121
+
 max_season_investors = 0
 min_season_investors = 3*350
 season_sum = 0
+row_sum = 0
+times = 0
 # This  loop goes through the months in the following way : 12 1 2 3 ... 11
 for row in range(1, 122):
     for i in range(13, 26):
@@ -130,6 +134,8 @@ for row in range(1, 122):
             continue
         char = get_column_letter(col)
         season_sum += ws[char + str(row)].value
+        # row_sum += ws[char + str(row)].value
+        # calculate the max and min of investors in season
         if char == 'C' or char == 'F' or char == 'I' or char == 'L':
             if season_sum > max_season_investors:
                 max_season_investors = season_sum
@@ -143,9 +149,6 @@ for row in range(1, 122):
                 min_investors_number_inSeason['season'] = getSeason(char)
                 min_investors_number_inSeason['investors'] = season_sum
             season_sum = 0
-
-
-Multi_year_average = Multi_year_sum / 121
 
 
 print("The multi year average is: " + str(Multi_year_average))
